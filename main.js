@@ -3,7 +3,7 @@
 * @prop {number} name
 * @prop {number} period
 * @prop {() => unknown | Promise<unknown>} fn
-* @prop {NodeJS.Timeout} timeout
+* @prop {number} timeout
 */
 
 export const msInHour = 3600000;
@@ -29,7 +29,10 @@ async function runTask(task) {
     const start = Date.now();
     await task.fn();
     const timeDrift = Date.now() - start;
-    task.timeout = setTimeout(() => runTask(task), task.period - timeDrift);
+    // Make sure we don't restart a stopped task
+    if (task.timeout) {
+        task.timeout = setTimeout(() => runTask(task), task.period - timeDrift);
+    }
 }
 
 /** @type {Map<string, Task>} */
@@ -59,6 +62,24 @@ export function stopTask(name) {
     const task = tasks.get(name);
     if (task) {
         clearTimeout(task.timeout);
+        task.timeout = 0;
+        return true;
+    }
+    return false;
+}
+/**
+ * @param {string} name
+ * @param {null|number} [offset=null]
+ * @param {number} [period=0]
+ */
+export function rescheduleTask(name, period = null, offset = 0) {
+    const task = tasks.get(name);
+    if (task) {
+        if (period !== null) {
+            task.period = period;
+        }
+        clearTimeout(task.timeout);
+        task.timeout = setTimeout(() => runTask(task), task.period + offset);
         return true;
     }
     return false;
