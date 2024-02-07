@@ -1,6 +1,6 @@
 {
     "name": "@weedzcokie/scheduler",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "",
     "type": "module",
     "main": "main.js",
@@ -13,6 +13,14 @@
     "keywords": [
         "scheduler"
     ],
-    "author": "",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/weedz/nodejs-scheduler.git"
+    },
+    "bugs": {
+        "url": "https://github.com/weedz/nodejs-scheduler/issues"
+    },
+    "homepage": "https://github.com/weedz/nodejs-scheduler#readme",
+    "author": "Linus Björklund",
     "license": "MIT"
 }
