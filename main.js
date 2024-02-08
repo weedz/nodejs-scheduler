@@ -1,14 +1,20 @@
 /**
 * export @typedef Task
 * @prop {number} name
-* @prop {number} period
 * @prop {() => unknown | Promise<unknown>} fn
 * @prop {number} timeout
+* @prop {() => number} getNextExecutionTime
 */
 
 export const msInHour = 3600000;
 export const msInDay = 86400000;
 
+export function msUntilFullMinute() {
+    const date = new Date(Date.now() + 60000);
+    date.setUTCSeconds(0, 0);
+
+    return date.getTime() - Date.now();
+}
 export function msUntilFullHour() {
     const date = new Date(Date.now() + msInHour);
     date.setUTCMinutes(0, 0, 0);
@@ -26,12 +32,10 @@ export function msUntilNextDay() {
  * @param {Task} task
  */
 async function runTask(task) {
-    const start = Date.now();
     await task.fn();
-    const timeDrift = Date.now() - start;
     // Make sure we don't restart a stopped task
     if (task.timeout) {
-        task.timeout = setTimeout(() => runTask(task), task.period - timeDrift);
+        task.timeout = setTimeout(() => runTask(task), task.getNextExecutionTime());
     }
 }
 
@@ -41,17 +45,17 @@ const tasks = new Map();
 /**
  * @param {string} name
  * @param {Task["fn"]} fn
- * @param {number} period
- * @param {number} [offset=0]
+ * @param {() => number} [period=() => 1000]
  */
-export function schedule(name, fn, period, offset = 0) {
+export function schedule(name, fn, period = () => 1000) {
+    /** @type {Task} */
     const task = {
         name,
         fn,
-        period,
         timeout: 0,
+        getNextExecutionTime: period,
     };
-    task.timeout = setTimeout(() => runTask(task), task.period + offset);
+    task.timeout = setTimeout(() => runTask(task), task.getNextExecutionTime());
     tasks.set(name, task);
 }
 
