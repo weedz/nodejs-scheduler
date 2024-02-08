@@ -32,10 +32,15 @@ export function msUntilNextDay() {
  * @param {Task} task
  */
 async function runTask(task) {
-    await task.fn();
+    try {
+        await task.fn();
+    } catch (_err) {
+        // TODO: propagate this to a caller/handler somewhere?
+        // uncaught error in task
+    }
     // Make sure we don't restart a stopped task
     if (task.timeout) {
-        task.timeout = setTimeout(() => runTask(task), task.getNextExecutionTime());
+        task.timeout = setTimeout(runTask, task.getNextExecutionTime(), task);
     }
 }
 
@@ -55,7 +60,7 @@ export function schedule(name, fn, period = () => 1000) {
         timeout: 0,
         getNextExecutionTime: period,
     };
-    task.timeout = setTimeout(() => runTask(task), task.getNextExecutionTime());
+    task.timeout = setTimeout(runTask, task.getNextExecutionTime(), task);
     tasks.set(name, task);
 }
 
@@ -83,7 +88,7 @@ export function rescheduleTask(name, period = null, offset = 0) {
             task.period = period;
         }
         clearTimeout(task.timeout);
-        task.timeout = setTimeout(() => runTask(task), task.period + offset);
+        task.timeout = setTimeout(runTask, task.period + offset, task);
         return true;
     }
     return false;
