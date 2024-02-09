@@ -1,9 +1,10 @@
-export interface Task {
+export interface Task<T = unknown> {
     name: string;
-    fn: () => unknown | Promise<unknown>;
+    fn: () => T | Promise<T>;
     timeout: undefined | NodeJS.Timeout;
     getNextExecutionTime: () => number;
     errorHandler?: (err: unknown) => unknown;
+    successHandler?: (result: T) => unknown;
 }
 
 export const msInHour = 3600000;
@@ -30,7 +31,8 @@ export function msUntilNextDay() {
 
 async function runTask(task: Task) {
     try {
-        await task.fn();
+        const result = await task.fn();
+        task.successHandler?.(result);
     } catch (err) {
         task.errorHandler?.(err);
     }
@@ -42,13 +44,19 @@ async function runTask(task: Task) {
 
 const tasks: Map<string, Task> = new Map();
 
-export function schedule(name: string, fn: () => number, period = () => 1000, errorHandler?: Task["errorHandler"]) {
+interface ScheduleOpts {
+    errorHandler?: Task["errorHandler"];
+    successHandler?: Task["successHandler"];
+}
+
+export function schedule(name: string, fn: () => number, period: Task["getNextExecutionTime"] = () => 1000, opts: ScheduleOpts = {}) {
     const task: Task = {
         name,
         fn,
         timeout: undefined,
         getNextExecutionTime: period,
-        errorHandler,
+        errorHandler: opts.errorHandler,
+        successHandler: opts.successHandler,
     };
     task.timeout = setTimeout(runTask, task.getNextExecutionTime(), task);
     tasks.set(name, task);
