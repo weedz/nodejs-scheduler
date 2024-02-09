@@ -1,4 +1,4 @@
-import { msUntilFullHour, msUntilFullMinute, msUntilNextDay, schedule, stopTask } from "./main.js";
+import { msUntilFullHour, msUntilFullMinute, msUntilNextDay, rescheduleTask, schedule, stopTask } from "./dist/main.js";
 
 console.log("Current date:", new Date().toISOString());
 
@@ -19,5 +19,14 @@ schedule("other thing", async () => {
 setTimeout(() => {
     if (stopTask("the thing")) {
         console.log("Stopped task 'the thing', this will not run again");
+        setTimeout(() => {
+            if (rescheduleTask("the thing")) {
+                console.log("Re-scheduled task 'the thing'");
+            } else {
+                console.log("Failed to restart task 'the thing', this should not happen..");
+            }
+        }, 140000);
+    } else {
+        console.log("Failed to stop task 'the thing', this should not happen..");
     }
 }, 140000);
