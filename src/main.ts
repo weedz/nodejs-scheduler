@@ -51,6 +51,10 @@ interface ScheduleOpts {
     successHandler?: Task["successHandler"];
 }
 
+export function allTasks() {
+    return tasks.values();
+}
+
 export function schedule(name: string, fn: () => number, period: Task["getNextExecutionTime"] = () => 1000, opts: ScheduleOpts = {}) {
     const task: Task = {
         name,
