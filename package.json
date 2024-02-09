@@ -1,12 +1,14 @@
 {
     "name": "@weedzcokie/scheduler",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "description": "",
     "type": "module",
     "main": "dist/main.js",
     "files": [
-        "dist/main.js"
+        "dist/main.js",
+        "dist/main.d.ts"
     ],
+    "types": "dist/main.d.ts",
     "scripts": {
         "build": "tsc",
         "prepublish": "pnpm run build"
