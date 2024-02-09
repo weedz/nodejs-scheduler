@@ -3,6 +3,7 @@ export interface Task<T = unknown> {
     fn: () => T | Promise<T>;
     timeout: undefined | NodeJS.Timeout;
     getNextExecutionTime: () => number;
+    lastExecutionTime: number;
     errorHandler?: (err: unknown) => unknown;
     successHandler?: (result: T) => unknown;
 }
@@ -30,6 +31,7 @@ export function msUntilNextDay() {
 }
 
 async function runTask(task: Task) {
+    task.lastExecutionTime = Date.now();
     try {
         const result = await task.fn();
         task.successHandler?.(result);
@@ -55,6 +57,7 @@ export function schedule(name: string, fn: () => number, period: Task["getNextEx
         fn,
         timeout: undefined,
         getNextExecutionTime: period,
+        lastExecutionTime: 0,
         errorHandler: opts.errorHandler,
         successHandler: opts.successHandler,
     };
