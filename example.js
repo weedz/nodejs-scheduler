@@ -1,10 +1,11 @@
-import { msUntilFullHour, msUntilFullMinute, msUntilNextDay, rescheduleTask, schedule, stopTask } from "./dist/main.js";
+import { msUntilFullHour, msUntilFullMinute, msUntilNextDay, msUntilNextMonth, rescheduleTask, schedule, stopTask } from "./dist/main.js";
 
 console.log("Current date:", new Date().toISOString());
 
-console.log("Until next day:", msUntilNextDay(), new Date(Date.now() + msUntilNextDay()));
-console.log("Until next full hour:", msUntilFullHour(), new Date(Date.now() + msUntilFullHour()));
 console.log("Until next minute:", msUntilFullMinute(), new Date(Date.now() + msUntilFullMinute()));
+console.log("Until next full hour:", msUntilFullHour(), new Date(Date.now() + msUntilFullHour()));
+console.log("Until next day:", msUntilNextDay(), new Date(Date.now() + msUntilNextDay()));
+console.log("Until next month:", msUntilNextMonth(), new Date(Date.now() + msUntilNextMonth()));
 
 schedule("the thing", async () => {
     console.log(`[${new Date().toISOString()}] The thing`);
