@@ -1,12 +1,14 @@
 {
     "name": "@weedzcokie/scheduler",
-    "version": "1.0.11",
+    "version": "1.0.12",
     "description": "",
     "type": "module",
     "main": "dist/main.js",
     "files": [
         "dist/main.js",
-        "dist/main.d.ts"
+        "dist/main.d.ts",
+        "dist/lib.js",
+        "dist/lib.d.ts"
     ],
     "types": "dist/main.d.ts",
     "scripts": {
