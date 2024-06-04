@@ -8,36 +8,6 @@ export interface Task<T = unknown> {
     successHandler?: (result: T) => unknown;
 }
 
-export const msInHour = 3600000;
-export const msInDay = 86400000;
-
-export function msUntilFullMinute() {
-    const date = new Date();
-    date.setUTCMinutes(date.getUTCMinutes() + 1, 0, 0);
-
-    return date.getTime() - Date.now();
-}
-export function msUntilFullHour() {
-    const date = new Date();
-    date.setUTCHours(date.getUTCHours() + 1, 0, 0, 0);
-
-    return date.getTime() - Date.now();
-}
-export function msUntilNextDay() {
-    const date = new Date();
-    date.setUTCDate(date.getUTCDate() + 1);
-    date.setUTCHours(0, 0, 0, 0);
-
-    return date.getTime() - Date.now();
-}
-export function msUntilNextMonth() {
-    const date = new Date();
-    date.setUTCMonth(date.getUTCMonth() + 1);
-    date.setUTCDate(1);
-    date.setUTCHours(0, 0, 0, 0);
-    return date.getTime() - Date.now();
-}
-
 async function runTask(task: Task) {
     task.lastExecutionTime = Date.now();
     try {
@@ -54,15 +24,14 @@ async function runTask(task: Task) {
 
 const tasks: Map<string, Task> = new Map();
 
-interface ScheduleOpts {
-    errorHandler?: Task["errorHandler"];
-    successHandler?: Task["successHandler"];
-}
-
 export function allTasks() {
     return tasks.values();
 }
 
+interface ScheduleOpts {
+    errorHandler?: Task["errorHandler"];
+    successHandler?: Task["successHandler"];
+}
 export function schedule(name: string, fn: () => number, period: Task["getNextExecutionTime"] = () => 1000, opts: ScheduleOpts = {}) {
     const task: Task = {
         name,
@@ -100,3 +69,5 @@ export function rescheduleTask(name: string, period?: Task["getNextExecutionTime
     task.timeout = setTimeout(runTask, task.getNextExecutionTime(), task);
     return true;
 }
+
+export * from "./lib.js";
