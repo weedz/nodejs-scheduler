@@ -8,6 +8,10 @@ export interface Task<T = unknown> {
   successHandler?: (result: T) => unknown;
 }
 
+function getTaskTimer(task: Task) {
+  return task.getNextExecutionTime() + 100;
+}
+
 async function runTask(task: Task) {
   task.lastExecutionTime = Date.now();
   try {
@@ -18,7 +22,7 @@ async function runTask(task: Task) {
   }
   // Make sure we don't restart a stopped task
   if (task.timeout) {
-    task.timeout = setTimeout(runTask, task.getNextExecutionTime() + 100, task);
+    task.timeout = setTimeout(runTask, getTaskTimer(task), task);
   }
 }
 
@@ -42,7 +46,7 @@ export function schedule(name: string, fn: () => number, period: Task["getNextEx
     errorHandler: opts.errorHandler,
     successHandler: opts.successHandler,
   };
-  task.timeout = setTimeout(runTask, task.getNextExecutionTime() + 100, task);
+  task.timeout = setTimeout(runTask, getTaskTimer(task), task);
   tasks.set(name, task);
 }
 
@@ -66,7 +70,7 @@ export function rescheduleTask(name: string, period?: Task["getNextExecutionTime
   }
   clearTimeout(task.timeout);
 
-  task.timeout = setTimeout(runTask, task.getNextExecutionTime(), task);
+  task.timeout = setTimeout(runTask, getTaskTimer(task), task);
   return true;
 }
 
