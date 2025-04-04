@@ -10,6 +10,6 @@ More examples in <https://github.com/weedz/nodejs-scheduler/blob/master/example.
 import schedule, { msUntilFullMinute } from "@weedzcokie/scheduler";
 
 schedule("task", () => {
-    console.log("Hello, world!);
+    console.log("Hello, world!");
 }, msUntilFullMinute);
 ```
